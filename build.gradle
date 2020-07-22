@@ -1,0 +1,50 @@
+buildscript {
+    ext {
+        springBootVersion = "2.3.1.RELEASE"
+    }
+}
+plugins {
+    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "java"
+    id "com.benjaminsproule.swagger" version "1.0.10"
+}
+
+repositories {
+    maven { url = "https://repo.spring.io/release" }
+    jcenter()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "io.swagger:swagger-annotations:1.5.22"
+}
+
+swagger {
+    apiSource {
+        springmvc = true
+        locations = ['swagger.plugin.test.SampleController']
+        schemes = ['http']
+        host = 'localhost'
+        basePath = '/'
+        info {
+            title = 'Test'
+            version = '0.0.1'
+        }
+        swaggerApiReader = 'com.github.kongchen.swagger.docgen.reader.SpringMvcApiReader'
+        modelConverters = ['io.swagger.validator.BeanValidator']
+        swaggerDirectory = "${project.buildDir}/docker"
+    }
+}
+
+build.dependsOn generateSwaggerDocumentation
